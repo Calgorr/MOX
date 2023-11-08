@@ -46,7 +46,7 @@ def solve(init_state, init_location, method):
         return A_STAR(init_state, init_location)
 
     elif method == "BiBFS":
-        ...
+        return Bi_BFS(init_state)
 
     else:
         return []
@@ -139,6 +139,72 @@ def heuristic(location):
                                 break
 
     return total / 4
+
+
+def Bi_BFS(startState):
+    fringe1 = util.Queue()
+    fringe2 = util.Queue()
+    visited1 = dict()
+    visited2 = dict()
+    actions1 = []
+    actions2 = []
+    fringe1.push(cube(startState, 0, actions1))
+    fringe2.push(cube(solved_state(), 0, actions2))
+    expanded_nodes = 0
+
+    while not fringe1.isEmpty() or not fringe2.isEmpty():
+        cube1: cube = fringe1.pop()
+        cube2: cube = fringe2.pop()
+        expanded_nodes += 2
+
+        if np.array_equiv(cube1.state, solved_state()) and np.array_equiv(
+            cube2.state, solved_state()
+        ):
+            return []
+        if (
+            to_tuple(cube1.state) in visited2
+        ):  # curr_state1 is the similar state in two bfs searches
+            actions = Bi_BFS_actions_appending(
+                cube1.sequence, visited2[to_tuple(cube1.state)]
+            )
+            return actions
+
+        if (
+            to_tuple(cube2.state) in visited1
+        ):  # curr_state2 is the similar state in two bfs searches
+            actions = Bi_BFS_actions_appending(
+                visited1[to_tuple(cube2.state)], cube2.sequence
+            )
+            return actions
+
+        if to_tuple(cube1.state) not in visited1:
+            visited1[to_tuple(cube1.state)] = cube1.sequence
+            for i in range(12):
+                nextState1 = next_state(cube1.state, i + 1)
+                if to_tuple(nextState1) not in visited1:
+                    fringe1.push(
+                        cube(nextState1, cube1.cost + 1, cube1.sequence + [i + 1])
+                    )
+
+        if to_tuple(cube2.state) not in visited2:
+            visited2[to_tuple(cube2.state)] = cube2.sequence
+            for i in range(12):
+                nextState2 = next_state(cube2.state, i + 1)
+                if to_tuple(nextState2) not in visited2:
+                    fringe2.push(
+                        cube(nextState2, cube2.cost + 1, cube2.sequence + [i + 1])
+                    )
+
+    return []
+
+
+def BFS():
+    pass
+
+
+Bi_BFS_actions_appending = lambda actions1, actions2: actions1 + [
+    action + 6 if action <= 6 else action - 6 for action in actions2[::-1]
+]
 
 
 solution_info = lambda explored, actions, expanded_nodes: (
