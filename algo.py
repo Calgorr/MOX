@@ -76,5 +76,6 @@ def IDFS(start_state):
         cost_limit += 1
 
 
+# use this function to convert a numpy array to a tuple so that it can be used as a key in a dictionary or set
 def to_tuple(array):
     return tuple(map(tuple, array))
