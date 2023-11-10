@@ -142,14 +142,14 @@ def A_STAR(start_state, start_location):
 
 
 def heuristic(location):
-    total = 0
+    heuristic_estimation = 0
     for i in range(2):
         for j in range(2):
             for k in range(2):
                 x, y, z = location_dict[location[i][j][k]]
-                total += abs(x - i) + abs(y - j) + abs(z - k)
+                heuristic_estimation += abs(x - i) + abs(y - j) + abs(z - k)
 
-    return total / 4
+    return heuristic_estimation / 4
 
 
 def Bi_BFS(startState):
