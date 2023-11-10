@@ -5,6 +5,17 @@ from util import util
 
 # from cube import cube
 
+location_dict = {
+    1: [0, 0, 0],
+    2: [0, 0, 1],
+    3: [0, 1, 0],
+    4: [0, 1, 1],
+    5: [1, 0, 0],
+    6: [1, 0, 1],
+    7: [1, 1, 0],
+    8: [1, 1, 1],
+}
+
 
 class cube:
     def __init__(self, state, cost, sequence, location=None) -> None:
@@ -85,7 +96,15 @@ def A_STAR(start_state, start_location):
     actions = []
     fringe = util.PriorityQueue()
     expanded_nodes = 0
-    fringe.push(cube(start_state, 0, actions, start_location), 0)
+    fringe.push(
+        cube(
+            start_state,
+            heuristic(start_location) + len(actions),
+            actions,
+            start_location,
+        ),
+        heuristic(start_location) + len(actions),
+    )
     while not fringe.isEmpty():
         current_node = fringe.pop()
         expanded_nodes += 1
@@ -93,11 +112,11 @@ def A_STAR(start_state, start_location):
             solution_info(visited, current_node.sequence, expanded_nodes)
             return current_node.sequence
         elif to_tuple(current_node.state) not in visited:
-            visited[to_tuple(current_node)] = current_node.cost
+            visited[to_tuple(current_node.state)] = current_node.cost
             for i in range(12):
                 nextState = next_state(current_node.state, i + 1)
                 nextLocation = next_location(current_node.location, i + 1)
-                nextCost = heuristic(nextLocation) + len(actions) + 1
+                nextCost = heuristic(nextLocation) + len(current_node.sequence) + 1
                 if to_tuple(nextState) not in visited:
                     fringe.push(
                         cube(
@@ -125,18 +144,12 @@ def A_STAR(start_state, start_location):
 
 
 def heuristic(location):
-    solved_Location = solved_location()
     total = 0
     for i in range(2):
         for j in range(2):
             for k in range(2):
-                curr_value = location[i, j, k]
-                for x in range(2):
-                    for y in range(2):
-                        for z in range(2):
-                            if solved_Location[x, y, z] == curr_value:
-                                total += abs(x - i) + abs(y - j) + abs(z - k)
-                                break
+                x, y, z = location_dict[location[i][j][k]]
+                total += abs(x - i) + abs(y - j) + abs(z - k)
 
     return total / 4
 
