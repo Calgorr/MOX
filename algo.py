@@ -174,12 +174,14 @@ def Bi_BFS(startState):
             actions = Bi_BFS_actions_appending(
                 cube1.sequence, visited2[to_tuple(cube1.state)]
             )
+            solution_info({**visited1, **visited2}, actions, expanded_nodes)
             return actions
 
         if to_tuple(cube2.state) in visited1:
             actions = Bi_BFS_actions_appending(
                 visited1[to_tuple(cube2.state)], cube2.sequence
             )
+            solution_info({**visited1, **visited2}, actions, expanded_nodes)
             return actions
 
         if to_tuple(cube1.state) not in visited1:
