@@ -157,10 +157,8 @@ def Bi_BFS(startState):
     fringe2 = util.Queue()
     visited1 = dict()
     visited2 = dict()
-    actions1 = []
-    actions2 = []
-    fringe1.push(cube(startState, 0, actions1))
-    fringe2.push(cube(solved_state(), 0, actions2))
+    fringe1.push(cube(startState, 0, []))
+    fringe2.push(cube(solved_state(), 0, []))
     expanded_nodes = 0
 
     while not fringe1.isEmpty() or not fringe2.isEmpty():
@@ -168,7 +166,7 @@ def Bi_BFS(startState):
         cube2: cube = fringe2.pop()
         expanded_nodes += 2
 
-        if np.array_equiv(cube1.state, solved_state()) and np.array_equiv(
+        if np.array_equal(cube1.state, solved_state()) and np.array_equal(
             cube2.state, solved_state()
         ):
             return []
@@ -203,10 +201,6 @@ def Bi_BFS(startState):
                     )
 
     return []
-
-
-def BFS():
-    pass
 
 
 Bi_BFS_actions_appending = lambda actions1, actions2: actions1 + [
