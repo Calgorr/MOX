@@ -3,8 +3,6 @@ from state import next_state, solved_state
 from location import next_location, solved_location
 from util import util
 
-# from cube import cube
-
 location_dict = {
     1: [0, 0, 0],
     2: [0, 0, 1],
@@ -174,17 +172,13 @@ def Bi_BFS(startState):
             cube2.state, solved_state()
         ):
             return []
-        if (
-            to_tuple(cube1.state) in visited2
-        ):  # curr_state1 is the similar state in two bfs searches
+        if to_tuple(cube1.state) in visited2:
             actions = Bi_BFS_actions_appending(
                 cube1.sequence, visited2[to_tuple(cube1.state)]
             )
             return actions
 
-        if (
-            to_tuple(cube2.state) in visited1
-        ):  # curr_state2 is the similar state in two bfs searches
+        if to_tuple(cube2.state) in visited1:
             actions = Bi_BFS_actions_appending(
                 visited1[to_tuple(cube2.state)], cube2.sequence
             )
@@ -224,10 +218,10 @@ solution_info = lambda explored, actions, expanded_nodes: (
     print(
         "Depth of the solution path:",
         len(actions),
-        "\nTotal number of expanded nodes:",
-        expanded_nodes,
         "\nTotal number of nodes explored:",
         len(explored),
+        "\nTotal number of expanded nodes:",
+        expanded_nodes,
     )
 )
 
