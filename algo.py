@@ -25,6 +25,9 @@ class cube:
     def __iter__(self):
         return iter(self.state)
 
+    def __hash__(self) -> int:
+        return hash(to_tuple(self.state))
+
 
 def solve(init_state, init_location, method):
     """
@@ -67,15 +70,15 @@ def IDFS(start_state):
         fringe = util.Stack()
         visited = set()
         fringe.push(cube(start_state, 0, list()))
+        expanded_nodes = 0
         while not fringe.isEmpty():
             current_node = fringe.pop()
+            visited.add(to_tuple(current_node.state))
+            expanded_nodes += 1
             if np.array_equal(current_node.state, solved_state()):
+                solution_info(visited, current_node.sequence, expanded_nodes)
                 return current_node.sequence
-            if (
-                current_node.cost <= cost_limit
-                and to_tuple(current_node.state) not in visited
-            ):
-                visited.add(to_tuple(current_node.state))
+            if current_node.cost < cost_limit:
                 for i in range(12):
                     nextState = next_state(current_node.state, i + 1)
                     if to_tuple(nextState) not in visited:
@@ -172,10 +175,11 @@ def Bi_BFS(startState):
                 actions = Bi_BFS_actions_appending(
                     cube1.sequence, temp2[to_tuple(cube1.state)]
                 )
-                solution_info({visited1.update(visited2)}, actions, expanded_nodes)
+                solution_info(visited1 | visited2, actions, expanded_nodes)
                 return actions
 
             if to_tuple(cube1.state) not in visited1:
+                visited1.add(to_tuple(cube1.state))
                 for i in range(12):
                     nextState1 = next_state(cube1.state, i + 1)
                     if to_tuple(nextState1) not in visited1:
@@ -192,10 +196,11 @@ def Bi_BFS(startState):
                 actions = Bi_BFS_actions_appending(
                     temp1[to_tuple(cube2.state)], cube2.sequence
                 )
-                solution_info({visited1.update(visited2)}, actions, expanded_nodes)
+                solution_info(visited1 | visited2, actions, expanded_nodes)
                 return actions
 
             if to_tuple(cube2.state) not in visited2:
+                visited2.add(to_tuple(cube2.state))
                 for i in range(12):
                     nextState2 = next_state(cube2.state, i + 1)
                     if to_tuple(nextState2) not in visited2:
