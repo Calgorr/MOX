@@ -155,52 +155,54 @@ def heuristic(location):
 def Bi_BFS(startState):
     fringe1 = util.Queue()
     fringe2 = util.Queue()
-    visited1 = dict()
-    visited2 = dict()
+    visited1 = set()
+    visited2 = set()
+    temp1 = dict()
+    temp2 = dict()
     fringe1.push(cube(startState, 0, []))
     fringe2.push(cube(solved_state(), 0, []))
     expanded_nodes = 0
 
     while not fringe1.isEmpty() or not fringe2.isEmpty():
-        cube1: cube = fringe1.pop()
-        cube2: cube = fringe2.pop()
-        expanded_nodes += 2
+        if expanded_nodes % 2 == 0:
+            cube1: cube = fringe1.pop()
+            expanded_nodes += 1
 
-        if np.array_equal(cube1.state, solved_state()) and np.array_equal(
-            cube2.state, solved_state()
-        ):
-            return []
-        if to_tuple(cube1.state) in visited2:
-            actions = Bi_BFS_actions_appending(
-                cube1.sequence, visited2[to_tuple(cube1.state)]
-            )
-            solution_info({**visited1, **visited2}, actions, expanded_nodes)
-            return actions
+            if to_tuple(cube1.state) in temp2:
+                actions = Bi_BFS_actions_appending(
+                    cube1.sequence, temp2[to_tuple(cube1.state)]
+                )
+                solution_info({visited1.update(visited2)}, actions, expanded_nodes)
+                return actions
 
-        if to_tuple(cube2.state) in visited1:
-            actions = Bi_BFS_actions_appending(
-                visited1[to_tuple(cube2.state)], cube2.sequence
-            )
-            solution_info({**visited1, **visited2}, actions, expanded_nodes)
-            return actions
+            if to_tuple(cube1.state) not in visited1:
+                for i in range(12):
+                    nextState1 = next_state(cube1.state, i + 1)
+                    if to_tuple(nextState1) not in visited1:
+                        fringe1.push(
+                            cube(nextState1, cube1.cost + 1, cube1.sequence + [i + 1])
+                        )
+                        temp1[to_tuple(nextState1)] = cube1.sequence + [i + 1]
 
-        if to_tuple(cube1.state) not in visited1:
-            visited1[to_tuple(cube1.state)] = cube1.sequence
-            for i in range(12):
-                nextState1 = next_state(cube1.state, i + 1)
-                if to_tuple(nextState1) not in visited1:
-                    fringe1.push(
-                        cube(nextState1, cube1.cost + 1, cube1.sequence + [i + 1])
-                    )
+        else:
+            cube2: cube = fringe2.pop()
+            expanded_nodes += 1
 
-        if to_tuple(cube2.state) not in visited2:
-            visited2[to_tuple(cube2.state)] = cube2.sequence
-            for i in range(12):
-                nextState2 = next_state(cube2.state, i + 1)
-                if to_tuple(nextState2) not in visited2:
-                    fringe2.push(
-                        cube(nextState2, cube2.cost + 1, cube2.sequence + [i + 1])
-                    )
+            if to_tuple(cube2.state) in temp1:
+                actions = Bi_BFS_actions_appending(
+                    temp1[to_tuple(cube2.state)], cube2.sequence
+                )
+                solution_info({visited1.update(visited2)}, actions, expanded_nodes)
+                return actions
+
+            if to_tuple(cube2.state) not in visited2:
+                for i in range(12):
+                    nextState2 = next_state(cube2.state, i + 1)
+                    if to_tuple(nextState2) not in visited2:
+                        fringe2.push(
+                            cube(nextState2, cube2.cost + 1, cube2.sequence + [i + 1])
+                        )
+                        temp2[to_tuple(nextState2)] = cube2.sequence + [i + 1]
 
     return []
 
@@ -210,12 +212,12 @@ Bi_BFS_actions_appending = lambda actions1, actions2: actions1 + [
 ]
 
 
-solution_info = lambda explored, actions, expanded_nodes: (
+solution_info = lambda visited, actions, expanded_nodes: (
     print(
         "Depth of the solution path:",
         len(actions),
-        "\nTotal number of nodes explored:",
-        len(explored),
+        "\nTotal number of nodes visited:",
+        len(visited),
         "\nTotal number of expanded nodes:",
         expanded_nodes,
     )
