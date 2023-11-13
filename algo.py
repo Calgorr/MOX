@@ -73,15 +73,21 @@ def IDFS(start_state):
         expanded_nodes = 0
         while not fringe.isEmpty():
             current_node = fringe.pop()
-            visited.add(to_tuple(current_node.state))
             expanded_nodes += 1
             if np.array_equal(current_node.state, solved_state()):
                 solution_info(visited, current_node.sequence, expanded_nodes)
                 return current_node.sequence
-            if current_node.cost < cost_limit:
+            if (
+                current_node.cost < cost_limit
+                and (to_tuple(current_node.state), current_node.cost) not in visited
+            ):
+                visited.add((to_tuple(current_node.state), current_node.cost))
                 for i in range(12):
                     nextState = next_state(current_node.state, i + 1)
-                    if to_tuple(nextState) not in visited:
+                    if (
+                        to_tuple(current_node.state),
+                        current_node.cost + 1,
+                    ) not in visited:
                         fringe.push(
                             cube(
                                 nextState,
